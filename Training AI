@@ -1,0 +1,97 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.utils import to_categorical
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.models import load_model
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+
+# Load data
+data = pd.read_csv('chess_data4.csv')
+
+# Preprocessing
+X = data.drop('Label:1-0', axis=1)
+y = data['Label:1-0']
+
+# Convert labels to one-hot vectors
+encoder = LabelEncoder()
+y = encoder.fit_transform(y)
+y = to_categorical(y)
+
+# Split data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create model
+model = Sequential()
+model.add(Dense(64, input_dim=X_train.shape[1], activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(y.shape[1], activation='softmax'))  # output layer size should match the number of classes
+
+# Compile model
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+# Define early stopping
+early_stopping = EarlyStopping(monitor='val_loss', patience=3)
+
+# Train model with early stopping and batch training
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=100, batch_size=32, callbacks=[early_stopping])
+
+# Save the model
+model.save('my_model.h5')
+
+# Load the model
+loaded_model = load_model('my_model.h5')
+
+# Make a prediction
+predictions = loaded_model.predict(X_test)
+
+# Create a directed graph
+G = nx.DiGraph()
+
+# Add nodes and edges for the input layer
+layer = model.layers[0]
+weights = layer.get_weights()[0]
+for i in range(weights.shape[0]):
+    for j in range(weights.shape[1]):
+        G.add_node(f'Input_Layer_Neuron_{i}')
+        G.add_node(f'Hidden_Layer_1_Neuron_{j}')
+        G.add_edge(f'Input_Layer_Neuron_{i}', f'Hidden_Layer_1_Neuron_{j}', weight=weights[i, j])
+
+# Add nodes and edges for each hidden layer
+for layer_num, layer in enumerate(model.layers[1:-1], start=1):
+    weights = layer.get_weights()[0]
+    for i in range(weights.shape[0]):
+        for j in range(weights.shape[1]):
+            G.add_node(f'Hidden_Layer_{layer_num}_Neuron_{i}')
+            G.add_node(f'Hidden_Layer_{layer_num+1}_Neuron_{j}')
+            G.add_edge(f'Hidden_Layer_{layer_num}_Neuron_{i}', f'Hidden_Layer_{layer_num+1}_Neuron_{j}', weight=weights[i, j])
+
+# Add nodes and edges for the output layer
+layer = model.layers[-1]
+weights = layer.get_weights()[0]
+for i in range(weights.shape[0]):
+    for j in range(weights.shape[1]):
+        G.add_node(f'Hidden_Layer_{len(model.layers)-1}_Neuron_{i}')
+        G.add_node(f'Output_Layer_Neuron_{j}')
+        G.add_edge(f'Hidden_Layer_{len(model.layers)-1}_Neuron_{i}', f'Output_Layer_Neuron_{j}', weight=weights[i, j])
+
+
+# # Get the weights of the edges
+# edge_weights = nx.get_edge_attributes(G, 'weight')
+#
+# # Normalize the weights to the range [0, 1]
+# weights = np.array(list(edge_weights.values()))
+# weights = (weights - weights.min()) / (weights.max() - weights.min())
+#
+# # Create a color map based on the normalized weights
+# cmap = plt.cm.viridis
+# colors = cmap(weights)
+#
+# # Draw the graph
+# nx.draw(G, with_labels=True, edge_color=colors)
+#
+# plt.show()
