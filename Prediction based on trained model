@@ -1,0 +1,39 @@
+import pandas as pd
+from tensorflow.keras.models import load_model
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+
+# Load the saved model
+model = load_model('my_model.h5')
+
+# Load new data
+data = pd.read_csv('chess_data4.csv')
+X_new = data.drop('Label:1-0', axis=1)
+
+# Create a LabelEncoder
+encoder = LabelEncoder()
+encoder.classes_ = np.array(['black', 'white'])
+
+# Make a prediction for each player in the dataset
+# Make a prediction for each player in the dataset
+# Make a prediction for each player in the dataset
+# Make a prediction for each player in the dataset
+for i in range(len(X_new)):
+    # Make a prediction
+    predictions = model.predict(X_new.iloc[i:i+1])
+
+    # Convert the predictions to class labels
+    predicted_classes = np.argmax(predictions, axis=1)
+    predicted_labels = encoder.inverse_transform(predicted_classes)
+
+    # Determine who is moving based on the last number before the label
+    if X_new.iloc[i, -2] == 0:
+        moving_player = 'white'
+    else:
+        moving_player = 'black'
+
+    # Print the predicted labels along with who is moving
+    print(f"The predicted outcome is {predicted_labels[0]} for the {moving_player} player.")
+
+    # Print the prediction probabilities
+    print(f"The prediction probabilities are {predictions[0]}")
