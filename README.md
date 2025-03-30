@@ -21,3 +21,14 @@ Zum Schluss wird mithilfe der networkx-Bibliothek ein gerichteter Graph erstellt
 
 Dabei werden die Neuronen der verschiedenen Schichten als Knoten und die Verbindungen zwischen ihnen als gewichtete Kanten dargestellt. Ein auskommentierter Codeabschnitt zeigt zudem eine Möglichkeit, die Verbindungen farblich zu visualisieren.
 
+## Prediction based on trained model
+
+Der Code lädt ein zuvor trainiertes neuronales Netzwerk, um Vorhersagen über den Ausgang von Schachpartien zu treffen. Dabei werden neue Spieldaten aus einer CSV-Datei eingelesen und für jede Partie eine Prognose erstellt.
+
+Zunächst wird das gespeicherte Modell my_model.h5 geladen, das zuvor trainiert wurde. Anschließend werden neue Spieldaten aus der Datei chess_data4.csv importiert, wobei die Spalte Label:1-0 entfernt wird, da sie die tatsächlichen Ergebnisse enthält und für die Vorhersage nicht benötigt wird.
+
+Ein LabelEncoder wird erstellt, um die möglichen Vorhersageklassen (black oder white) zu kodieren. Danach wird für jede Partie in den Daten eine Vorhersage getroffen: Das Modell erhält eine einzelne Zeile der Spieldaten als Eingabe und gibt eine Wahrscheinlichkeitsverteilung für die möglichen Ergebnisse aus. Der wahrscheinlichste Wert wird bestimmt und mithilfe des LabelEncoder in die entsprechende Spielerfarbe (black oder white) zurückübersetzt.
+
+Zusätzlich wird geprüft, welcher Spieler am Zug ist. Dies geschieht anhand der vorletzten Spalte des Datensatzes, wobei ein Wert von 0 auf einen weißen Spieler und 1 auf einen schwarzen Spieler hinweist. Schließlich werden das vorhergesagte Ergebnis sowie die Wahrscheinlichkeiten der verschiedenen Optionen ausgegeben.
+
+Der Code ermöglicht also die Vorhersage des Spielausgangs für einzelne Partien und liefert eine Einschätzung, basierend auf den bereitgestellten Daten.
