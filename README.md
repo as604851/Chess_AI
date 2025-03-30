@@ -3,6 +3,7 @@ Convert PGN-string into vector:
 Der Code verarbeitet eine Liste von Schachzügen aus einer Datei, simuliert die Spielverläufe und speichert die daraus resultierenden Brettzustände in einer CSV-Datei. Dabei wird jedes Schachbrett in eine numerische Vektorform umgewandelt, die sich für maschinelles Lernen nutzen lässt.
 Zunächst wird ein Schachbrett als Datenstruktur implementiert:
 ![image](https://github.com/user-attachments/assets/dafa72e7-3be9-4b41-8a9b-388d0a97e709)
+
 Es besteht aus einer 8×8-Matrix, in der leere Felder durch Punkte und Schachfiguren durch ihre jeweiligen Zeichen dargestellt werden. Zusätzlich wird festgehalten, welcher Spieler am Zug ist. Die Umwandlung des Bretts in eine numerische Darstellung erfolgt über eine Zuordnung von Zahlenwerten zu den einzelnen Figuren. Ein weißer Bauer ist als -1 und ein schwarzer als 1 kodiert werden, während der aktuelle Spieler als zusätzliche Information (0 für Weiß, 1 für Schwarz) mitgespeichert wird:
 ![image](https://github.com/user-attachments/assets/eed2e9fe-9727-41ef-9df8-142f0995cbb8)
 
