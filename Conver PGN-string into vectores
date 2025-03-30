@@ -1,0 +1,77 @@
+import numpy as np
+import csv
+
+class ChessBoard:
+    def __init__(self):
+        self.board = [['.' for _ in range(8)] for _ in range(8)]
+        self.turn = 'White'  # Start with white's turn
+
+    def get_vector(self):
+        # Flatten the board and map each piece to a numerical value
+        piece_to_num = {'.': 0, 'p': 1, 'P': -1, 'n': 2, 'N': -2, 'b': 3, 'B': -3, 'r': 4, 'R': -4, 'q': 5, 'Q': -5, 'k': 6, 'K': -6}
+        board_vector = [piece_to_num.get(piece, 0) for row in self.board for piece in row]  # Use get method with default value 0
+        # Map the turn to a numerical value
+        turn_vector = [0] if self.turn == 'White' else [1]
+        # Concatenate the board vector and the turn vector
+        return board_vector + turn_vector
+
+    def update_board(self, piece, square):
+        file = ord(square[0]) - ord('a')
+        rank = 8 - int(square[1])
+        self.board[rank][file] = piece
+        self.turn = 'Black' if self.turn == 'White' else 'White'  # Switch turns
+
+def assign_case(piece, is_white):
+    return piece.lower() if is_white else piece.upper()
+
+def result_to_string(result):
+    if result == '0-1':
+        return '.....0-1.......'  # Loss for the white team
+    elif result == '1-0':
+        return '.....1-0.......'  # Win for the white team
+    else:
+        return '................'  # Draw
+
+def process_moves(moves):
+    result = moves[-1]  # Extract result
+    moves = moves[:-1]  # Remove result from the list
+
+    board = ChessBoard()
+
+    with open('chess_data2.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        # Write the header
+        writer.writerow([f"Cell_{i}" for i in range(64)] + ["Label"])
+
+        for move in moves:
+            piece = 'p' if len(move) == 2 else move[0]
+            piece = assign_case(piece, board.turn == 'White')
+            square = move[-2:]
+
+            # Check if square contains a valid chess square notation
+            if square[0] in 'abcdefgh' and square[1] in '12345678':
+                board.update_board(piece, square)
+
+                # Get the vector representation of the board and the turn
+                vector = board.get_vector()
+                label = result_to_string(result)
+
+                # Convert the vector to a list of strings
+                vector_str = list(map(str, vector))
+
+                # Write the vector and label to the CSV file
+                writer.writerow(vector_str + [label])
+            else:
+                print(f"Invalid move: {move}")
+def read_moves_from_file(file_path):
+    with open(file_path, 'r') as file:
+        moves = file.read().split()
+    return moves
+
+def main():
+    file_path = r"file_path"  # Replace with your file path
+    moves = read_moves_from_file(file_path)
+    process_moves(moves)
+
+if __name__ == "__main__":
+    main()
