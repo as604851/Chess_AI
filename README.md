@@ -1,4 +1,4 @@
-Convert PGN-string into vector:
+## Convert PGN-string into vector:
 
 Der Code verarbeitet eine Liste von Schachzügen aus einer Datei, simuliert die Spielverläufe und speichert die daraus resultierenden Brettzustände in einer CSV-Datei. Dabei wird jedes Schachbrett in eine numerische Vektorform umgewandelt, die sich für maschinelles Lernen nutzen lässt.
 Zunächst wird ein Schachbrett als Datenstruktur implementiert:
@@ -10,7 +10,7 @@ Es besteht aus einer 8×8-Matrix, in der leere Felder durch Punkte und Schachfig
 Die Verarbeitung der Züge beginnt mit dem Einlesen einer Textdatei, die eine Sequenz von Schachzügen enthält. Diese Züge werden analysiert und nach festgelegten Regeln interpretiert. Für jeden Zug wird die entsprechende Figur auf dem virtuellen Schachbrett platziert, wobei darauf geachtet wird, dass Schwarz und Weiß korrekt unterschieden werden. Nach jedem Zug wird der aktuelle Brettzustand in einen Zahlenvektor umgewandelt und in eine CSV-Datei geschrieben. Dabei wird auch das Spielergebnis gespeichert, das entweder einen Sieg für Weiß (1-0), einen Sieg für Schwarz (0-1) oder ein Unentschieden widerspiegelt.
 Während der Verarbeitung wird überprüft, ob die Züge gültig sind. Falls ein ungültiger Zug auftritt, wird eine Warnung ausgegeben. Am Ende steht eine CSV-Datei, die für jedes Brett eine numerische Repräsentation enthält, ergänzt durch das finale Spielergebnis. Diese Datenstruktur könnte beispielsweise für maschinelles Lernen genutzt werden, um Muster in Schachpartien zu erkennen oder eine KI zu trainieren.
 
-Training AI: 
+## Training AI: 
 
 Der gegebene Code implementiert ein neuronales Netzwerk zur Klassifikation von Schachpartien basierend auf einer CSV-Datei mit Spielinformationen. Zunächst werden die notwendigen Bibliotheken importiert, darunter pandas für die Datenverarbeitung, scikit-learn für das Aufteilen der Daten und die Umwandlung der Labels, tensorflow.keras für das Erstellen und Trainieren des Modells sowie matplotlib und networkx für die Visualisierung.
 Die Daten werden aus einer CSV-Datei geladen, wobei die Spalte mit den Labels (Label:1-0) von den Eingangsmerkmalen (X) getrennt wird. Die Zielwerte (y) werden anschließend in numerische Kategorien umgewandelt und in das One-Hot-Format gebracht, um sie für das neuronale Netzwerk nutzbar zu machen. Danach werden die Daten in ein Trainings- und ein Testset aufgeteilt.
