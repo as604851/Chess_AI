@@ -1,39 +1,44 @@
-import pandas as pd
-from tensorflow.keras.models import load_model
-from sklearn.preprocessing import LabelEncoder
-import numpy as np
+# Import necessary libraries
+import pandas as pd                     # For loading and manipulating tabular data
+from tensorflow.keras.models import load_model  # For loading a saved Keras model
+from sklearn.preprocessing import LabelEncoder  # For converting numerical predictions to readable labels
+import numpy as np                      # For numerical operations
 
-# Load the saved model
+# Load the trained model from an HDF5 file
 model = load_model('my_model.h5')
 
-# Load new data
+# Load input data from CSV file; each row represents a chess board state + label
 data = pd.read_csv('chess_data4.csv')
+
+# Remove the label column to get input features only
+# 'Label:1-0' is assumed to be the outcome column from training
 X_new = data.drop('Label:1-0', axis=1)
 
-# Create a LabelEncoder
+# Initialize label encoder and manually set class order
+# This should match the label encoding used during model training
 encoder = LabelEncoder()
 encoder.classes_ = np.array(['black', 'white'])
 
-# Make a prediction for each player in the dataset
-# Make a prediction for each player in the dataset
-# Make a prediction for each player in the dataset
-# Make a prediction for each player in the dataset
+# Iterate over each board state (row) and make a prediction
 for i in range(len(X_new)):
-    # Make a prediction
-    predictions = model.predict(X_new.iloc[i:i+1])
+    # Extract a single board state as input to the model
+    sample = X_new.iloc[i:i+1]  # Keep as DataFrame to preserve shape
 
-    # Convert the predictions to class labels
+    # Predict probabilities for both classes ('black' and 'white')
+    predictions = model.predict(sample)
+
+    # Convert predicted probabilities to a class index (0 or 1)
     predicted_classes = np.argmax(predictions, axis=1)
+
+    # Convert the index to a string label using the encoder
     predicted_labels = encoder.inverse_transform(predicted_classes)
 
-    # Determine who is moving based on the last number before the label
-    if X_new.iloc[i, -2] == 0:
-        moving_player = 'white'
-    else:
-        moving_player = 'black'
+    # Determine whose move it is from the second-to-last feature (turn flag)
+    # Convention: 0 = white's turn, 1 = black's turn
+    moving_player = 'white' if X_new.iloc[i, -2] == 0 else 'black'
 
-    # Print the predicted labels along with who is moving
+    # Output the predicted winner and the current moving player
     print(f"The predicted outcome is {predicted_labels[0]} for the {moving_player} player.")
 
-    # Print the prediction probabilities
+    # Output the model's raw prediction probabilities
     print(f"The prediction probabilities are {predictions[0]}")
